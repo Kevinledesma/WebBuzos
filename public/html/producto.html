@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalles del Producto</title>
+</head>
+<body>
+  <h1>Detalles del Producto</h1>
+  <div id="producto-detalle"></div>
+  <button onclick="volver()">Volver</button>
+
+  <script>
+   
+
+    // Obtener el ID del producto de la URL
+    const productId = window.location.pathname.split('/').pop();
+
+    // Obtener detalles del producto
+    function fetchProductDetails() {
+        fetch(`/api/products/details/${productId}`) // Llama a la ruta API correcta
+          .then(res => res.json())
+          .then(product => {
+            const container = document.getElementById('producto-detalle');
+            container.innerHTML = `
+              <h2>${product.nombre}</h2>
+              <p>${product.descripcion}</p>
+              <p>Precio: $${product.precio}</p>
+            `;
+          })
+          .catch(err => console.error('Error al obtener el producto:', err));
+      }
+
+    // Función para volver a la página principal
+    function volver() {
+      window.location.href = '/api/products';
+    }
+
+    // Cargar detalles del producto al iniciar
+    fetchProductDetails();
+  </script>
+</body>
+</html>

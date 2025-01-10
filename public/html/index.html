@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <title>Lista de Productos</title>
+    <style>
+        #productos-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .producto {
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .producto h2 {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .producto p {
+            font-size: 1em;
+            color: #555;
+        }
+    </style>
+    </head>
+
+    <body>
+        <h1>Lista de Productos</h1>
+
+        <div id="productos-container">
+            <!-- Aquí se agregarán los productos de forma dinámica -->
+        </div>
+
+        <script>
+            // Hacer la solicitud al backend para obtener los productos
+            fetch('http://localhost:3000/api/products/data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(products => {
+                    const container = document.getElementById('productos-container');
+                    products.forEach(product => {
+                        const productElement = document.createElement('div');
+                        productElement.classList.add('producto');
+                        productElement.innerHTML = `
+                            <h2>${product.nombre}</h2>
+                            <p>${product.descripcion}</p>
+                            <p>Precio: $${product.precio}</p>
+                            <button onclick="verDetalles(${product.id})">Ver detalles</button>
+                        `;
+                        container.appendChild(productElement);
+                    });
+                })
+                .catch(error => console.error('Error al obtener los productos:', error));
+
+            // Función para redirigir a la página de detalles
+            function verDetalles(id) {
+                window.location.href = `/api/products/${id}`;
+            }
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,122 @@
+<!-- frontend/html/panel.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+</head>
+
+<body>
+    <h1>Bienvenido al Panel de Administración</h1>
+
+    <h1>agregar nuevo producto</h1>
+    <div>
+        <h2>Agregar Nuevo Producto</h2>
+        <form id="add-product-form">
+          <input type="text" id="nombre" placeholder="Nombre" required>
+          <input type="text" id="descripcion" placeholder="Descripción" required>
+          <input type="number" id="precio" placeholder="Precio" required>
+          <button type="submit">Agregar</button>
+        </form>
+      </div>
+
+
+    <div id="productos-container">
+        <!-- Aquí se agregarán los productos de forma dinámica -->
+    </div>
+
+    <a href="/api/consultas/adminConsultas">
+        <button>Ver Consultas</button>
+      </a>
+
+    <form method="POST" action="/api/admin/logout">
+        <button type="submit">Cerrar sesión</button>
+    </form>
+
+
+
+    <script>
+        // Hacer la solicitud al backend para obtener los productos
+        fetch('http://localhost:3000/api/admin/panel/data')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(products => {
+                const container = document.getElementById('productos-container');
+                products.forEach(product => {
+                    const productElement = document.createElement('div');
+
+                    productElement.classList.add('producto');
+                    productElement.innerHTML = `
+            <h2>${product.nombre}</h2>
+            <p>${product.descripcion}</p>
+            <p>Precio: $${product.precio}</p>
+            <button onclick="deleteProduct(${product.id})">Eliminar</button>
+            <button onclick="editProduct(${product.id})">Editar</button>
+          `;
+                    container.appendChild(productElement);
+                });
+            })
+            .catch(error => console.error('Error al obtener los productos:', error));
+
+        function deleteProduct(id) {
+            fetch(`http://localhost:3000/api/products/eliminar/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(res => res.json())
+                .then(() => {
+                    alert('Producto eliminado exitosamente');
+                    fetchProducts();
+                })
+                .catch(err => console.error('Error al eliminar el producto:', err));
+        }
+
+        document.getElementById('add-product-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+      
+            const nombre = document.getElementById('nombre').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const precio = document.getElementById('precio').value;
+      
+            fetch(`${API_URL}/add`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre, descripcion, precio })
+            })
+            .then(res => res.json())
+            .then(() => {
+              alert('Producto agregado exitosamente');
+              fetchProducts();
+            })
+            .catch(err => console.error('Error al agregar el producto:', err));
+          });
+
+          document.getElementById('add-product-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+      
+            const nombre = document.getElementById('nombre').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const precio = document.getElementById('precio').value;
+      
+            fetch(`http://localhost:3000/api/products/agregar`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nombre, descripcion, precio })
+            })
+            .then(res => res.json())
+            .then(() => {
+              alert('Producto agregado exitosamente');
+              fetchProducts();
+            })
+            .catch(err => console.error('Error al agregar el producto:', err));
+          });
+    </script>
+</body>
+</body>
+
+</html>
